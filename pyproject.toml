@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "picker"
+version = "0.1.0"
+description = "zxc"
+authors = [ "qc7 <yaz0zero@gmail.com>" ]
+readme = "README.md"
+packages = [
+    { include = "picker" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10, <3.12"
+torch = "1.13.1"
+torchvision = "0.14.1"
+tqdm = "4.64.1"
+pytest = "7.2.1"
+pytest-cov = "^4.0.0"
+ruff = "^0.0.244"
+black = "^23.1.0"
+wandb = "^0.13.10"
+pandas = "^2.0.1"
+flask = "^2.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
