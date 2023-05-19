@@ -105,13 +105,3 @@ class HeroAdderButton(AbstractFrame):
             self.button.config(
                 text=f"Add {self.hero.name}\nto pos {pos}", background="green"
             )
-
-
-if __name__ == "__main__":
-    pass
-    # root = tk.Tk()
-    # frame = tk.Frame(root, width=800, height=600)
-    # frame.pack()
-    # runner = DesktopProgramRunner()
-    # HeroDrafterButton(HEROES[1], runner, master=frame).pack()
-    # root.mainloop()

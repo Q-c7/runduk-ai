@@ -33,7 +33,6 @@ class MyApp(tk.Tk):
     def show_frame(self, page_name, **kwargs):
         if page_name == "PickerFrame" and "to_predictor" in kwargs:
             assert self.frames["PickerFrame"].runner.prediction_display is not None
-            # print('KWARG', kwargs['to_predictor'])
             self.frames["PickerFrame"].runner.prediction_display.update_preferences(
                 kwargs["to_predictor"]
             )

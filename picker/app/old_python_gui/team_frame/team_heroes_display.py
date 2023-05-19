@@ -45,10 +45,6 @@ class TeamHeroesDisplay(AbstractFrame):
 
         return current_player
 
-        # print('Debugging team heroes display:')
-        # print(self.heroes)
-        # print()
-
     def update_ui(self) -> None:
         current_player = self._update_heroes()
 

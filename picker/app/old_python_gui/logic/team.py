@@ -132,9 +132,6 @@ class TeamManager:
                 continue
             ret[i] = column.explode().dropna().unique().tolist()
 
-        # print(ret)
-        # print()
-
         return ret
 
     def add_preference(self, name: str, hero_id: int, position: int) -> None:
@@ -184,8 +181,5 @@ class TeamManager:
         for hero_pos, heroes_list in reversed_prefs.items():
             for hero_id in heroes_list:
                 ret[hero_id].append(hero_pos)
-
-        print("Reversed prefs:")
-        print(ret)
 
         return ret
