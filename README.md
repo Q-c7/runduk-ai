@@ -33,8 +33,9 @@ Note, if your poetry commands hang, try this:
 
 1. Install Poetry
 
-    curl -sSL https://install.python-poetry.org | python3 -
-
+```shell
+curl -sSL https://install.python-poetry.org | python3 -
+```
 
 2. Install the project
 
