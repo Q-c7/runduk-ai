@@ -17,35 +17,35 @@ from picker.scraping.constants import (
 
 
 def _parse_match(match: dict[Any, Any]) -> dict[str, Any] | None:
-    if len(match["players"]) != 10:
+    if len(match['radiant_team']) + len(match['dire_team']) != 10:
         logging.debug(
             f"Wrong number of players for match ID {match['match_id']}, seq_num {match['match_seq_num']}"
         )
         return None
 
-    ret = dict()
-    for name in (
-        "match_id",
-        "match_seq_num",
-        "game_mode",
-        "start_time",
-        "duration",
-        "avg_rank_tier",
-        "avg_mmr",
-    ):
-        ret[name] = match[name]
-    ret["bans"] = None
-    if "picks_bans" in match:
-        pbs: list[dict[str, int | bool]] = match["picks_bans"]
-        ret["bans"] = [pb["hero_id"] for pb in pbs if not pb["is_pick"]]
-    ret["winner_team"] = []
-    ret["loser_team"] = []
-    for idx, p in enumerate(match["players"]):
-        nam = "winner_team" if p["win"] else "loser_team"
-        ret[nam].append(p["hero_id"])
-    ret["radiant_won"] = match["players"][0]["win"]
+    # ret = dict()
+    # for name in (
+    #     "match_id",
+    #     "match_seq_num",
+    #     "game_mode",
+    #     "start_time",
+    #     "duration",
+    #     "avg_rank_tier",
+    #     "avg_mmr",
+    # ):
+    #     ret[name] = match[name]
+    # ret["bans"] = None
+    # if "picks_bans" in match:
+    #     pbs: list[dict[str, int | bool]] = match["picks_bans"]
+    #     ret["bans"] = [pb["hero_id"] for pb in pbs if not pb["is_pick"]]
+    # ret["winner_team"] = []
+    # ret["loser_team"] = []
+    # for idx, p in enumerate(match["players"]):
+    #     nam = "winner_team" if p["win"] else "loser_team"
+    #     ret[nam].append(p["hero_id"])
+    # ret["radiant_won"] = match["players"][0]["win"]
 
-    return ret
+    return match
 
 
 def _get_web_datetime(dt: datetime.datetime) -> str:
@@ -61,20 +61,15 @@ def _get_web_datetime(dt: datetime.datetime) -> str:
 
 
 def _generate_request(
-    left_ts: datetime.datetime, right_ts: datetime.datetime, matches_count: int = 100000
+    left_ts: datetime.datetime, right_ts: datetime.datetime, matches_count: int = 20000
 ) -> str:
     left_ts_str = _get_web_datetime(left_ts)
     right_ts_str = _get_web_datetime(right_ts)
 
-    request = f"""https://api.opendota.com/api/explorer?sql=SELECT%0Ajson_agg(m)%20matches
-    %0AFROM%20(%0A%20%20SELECT%20match_id%2C%20num_mmr%2C%20match_seq_num%2C%20duration
-    %2C%20start_time%2C%20game_mode%2C%20avg_mmr%2C%20avg_rank_tier%2C%0A%20%20
-    (%0A%20%20%20%20SELECT%20json_agg(p)%0A%20%20%20%20FROM%20
-    (%0A%20%20%20%20%20%20SELECT%20hero_id%2C%20((player_slot%20%3C%20128)
-    %20%3D%20public_matches.radiant_win)%20win%0A%20%20%20%20%20%20FROM%20
-    public_player_matches%0A%20%20%20%20%20%20WHERE%20true
-    %20%0A%20%20%20%20%20%20AND%20match_id%20%3D%20public_matches.match_id
-    %20%0A%20%20%20%20)%20p%0A%20%20)%20players%0A%20%20FROM%20public_matches
+    request = f"""https://api.opendota.com/api/explorer?sql=SELECT%0Ajson_agg(m)%20public_matches
+    %0AFROM%20(%0A%20%20SELECT%20match_id%2C%20match_seq_num%2C%20duration
+    %2C%20start_time%2C%20game_mode%2C%20avg_rank_tier%2C%20radiant_team%2C%20dire_team%2C%20radiant_win%20
+    FROM%20public_matches
     %20%0A%20%20WHERE%20TRUE%20%0A%20%20AND%20start_time%20%3E%20
     extract(epoch%20from%20timestamp%20{left_ts_str})
     %0A%20%20AND%20start_time%20%3C%20
@@ -109,16 +104,28 @@ def request_matches_by_time(
                     "Can't download DATA using more than 10 retries, skipping..."
                 )
                 return []
+        elif msg.status_code == 429:
+            logging.warning("Rate limit exceeded, retrying in 1 minute...")
+            logging.warning(f"Response text: {msg.text}")
+            sleep(60)
+            retries += 1
+            if retries > 10:
+                logging.error(
+                    "Can't download DATA using more than 10 retries, skipping..."
+                )
+                return []
         else:
             assert False, f"Unknown status code {msg.status_code}"
 
     msg_dict = orjson.loads(msg.text)
-    raw_matches = msg_dict["rows"][0]["matches"]
+    raw_matches = msg_dict["rows"][0]["public_matches"]
     parsed_matches = []
-    for m in raw_matches:
-        parsed_m = _parse_match(m)
-        if parsed_m is not None:
-            parsed_matches.append(parsed_m)
+
+    if raw_matches is not None:
+        for m in raw_matches:
+            parsed_m = _parse_match(m)
+            if parsed_m is not None:
+                parsed_matches.append(parsed_m)
 
     return parsed_matches
 

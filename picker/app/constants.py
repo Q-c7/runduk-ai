@@ -77,7 +77,7 @@ HEROES = [
     Hero(63, 64, "Jakiro", [5, 4], []),
     Hero(64, 65, "Batrider", [2, 3], []),
     Hero(65, 66, "Chen", [5], [4]),
-    Hero(66, 67, "Spectre", [4], []),
+    Hero(66, 67, "Spectre", [1], []),
     Hero(67, 68, "Ancient_Apparition", [5], [4]),
     Hero(68, 69, "Doom", [3], []),
     Hero(69, 70, "Ursa", [1], []),
