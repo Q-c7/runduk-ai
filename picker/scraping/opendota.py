@@ -17,7 +17,7 @@ from picker.scraping.constants import (
 
 
 def _parse_match(match: dict[Any, Any]) -> dict[str, Any] | None:
-    if len(match['radiant_team']) + len(match['dire_team']) != 10:
+    if len(match["radiant_team"]) + len(match["dire_team"]) != 10:
         logging.debug(
             f"Wrong number of players for match ID {match['match_id']}, seq_num {match['match_seq_num']}"
         )
@@ -48,36 +48,47 @@ def _parse_match(match: dict[Any, Any]) -> dict[str, Any] | None:
     return match
 
 
-def _get_web_datetime(dt: datetime.datetime) -> str:
-    return (
-        "%27"
-        + dt.strftime("%Y-%m-%dT%H")
-        + "%3A"
-        + dt.strftime("%M")
-        + "%3A"
-        + dt.strftime("%S.000Z")
-        + "%27"
-    )
+# def _get_web_datetime(dt: datetime.datetime) -> str:
+#     return (
+#         "%27"
+#         + dt.strftime("%Y-%m-%dT%H")
+#         + "%3A"
+#         + dt.strftime("%M")
+#         + "%3A"
+#         + dt.strftime("%S.000Z")
+#         + "%27"
+#     )
 
 
 def _generate_request(
-    left_ts: datetime.datetime, right_ts: datetime.datetime, matches_count: int = 20000
+    left_ts: datetime.datetime, right_ts: datetime.datetime, duration: int = 900, matches_count: int = 200000
 ) -> str:
-    left_ts_str = _get_web_datetime(left_ts)
-    right_ts_str = _get_web_datetime(right_ts)
+    left_ts_int = int(left_ts.timestamp())
+    right_ts_int = int(right_ts.timestamp())
 
     request = f"""https://api.opendota.com/api/explorer?sql=SELECT%0Ajson_agg(m)%20public_matches
-    %0AFROM%20(%0A%20%20SELECT%20match_id%2C%20match_seq_num%2C%20duration
+    %0AFROM%20(%0ASELECT%20match_id%2C%20match_seq_num%2C%20duration
     %2C%20start_time%2C%20game_mode%2C%20avg_rank_tier%2C%20radiant_team%2C%20dire_team%2C%20radiant_win%20
-    FROM%20public_matches
-    %20%0A%20%20WHERE%20TRUE%20%0A%20%20AND%20start_time%20%3E%20
-    extract(epoch%20from%20timestamp%20{left_ts_str})
-    %0A%20%20AND%20start_time%20%3C%20
-    extract(epoch%20from%20timestamp%20{right_ts_str})
-    %0A%20%20AND%20duration%20%3E%20900%20%0A%20%20
-    %0A%20%20LIMIT%20{matches_count})%20m""".replace(
+    %0AFROM%20public_matches
+    %0AWHERE%20start_time%20BETWEEN%20{left_ts_int}%20AND%20{right_ts_int}
+    %0AAND%20duration%20%3E%20{duration}%20%0ALIMIT%20{matches_count})%20m
+    """.replace(
         "\n", ""
     )
+
+    # Old format
+    # request = f"""https://api.opendota.com/api/explorer?sql=SELECT%0Ajson_agg(m)%20public_matches
+    # %0AFROM%20(%0A%20%20SELECT%20match_id%2C%20match_seq_num%2C%20duration
+    # %2C%20start_time%2C%20game_mode%2C%20avg_rank_tier%2C%20radiant_team%2C%20dire_team%2C%20radiant_win%20
+    # FROM%20public_matches
+    # %20%0A%20%20WHERE%20TRUE%20%0A%20%20AND%20start_time%20%3E%20
+    # extract(epoch%20from%20timestamp%20{left_ts_str})
+    # %0A%20%20AND%20start_time%20%3C%20
+    # extract(epoch%20from%20timestamp%20{right_ts_str})
+    # %0A%20%20AND%20duration%20%3E%20900%20%0A%20%20
+    # %0A%20%20LIMIT%20{matches_count})%20m""".replace(
+    #     "\n", ""
+    # )
 
     return request
 

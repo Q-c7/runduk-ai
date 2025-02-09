@@ -77,7 +77,7 @@ def run_training(
     optimizer,
     epochs: int = 10,
     batch_size: int = 512,
-    device: str = "cuda:1",
+    device: str = "cuda",
 ):
     torch.manual_seed(3407)
 
@@ -96,24 +96,30 @@ def run_training(
 
     model = model.to(device)
 
-    for epoch in range(epochs):
-        loss_log = train(
-            model=model,
-            train_dl=train_dl,
-            criterion=criterion,
-            optimizer=optimizer,
-            device=device,
-        )
-        epoch_losses.append(np.mean(loss_log))
+    try:
+        for epoch in range(epochs):
+            loss_log = train(
+                model=model,
+                train_dl=train_dl,
+                criterion=criterion,
+                optimizer=optimizer,
+                device=device,
+            )
+            epoch_losses.append(np.mean(loss_log))
 
-        accs = [
-            test(model=model, test_dl=test_dl, device=device) * 100
-            for test_dl in test_dls
-        ]
-        epoch_accs.append(accs)
+            accs = [
+                test(model=model, test_dl=test_dl, device=device) * 100
+                for test_dl in test_dls
+            ]
+            epoch_accs.append(accs)
 
-        clear_output()
-        plot_stuff(losses=epoch_losses, accs=epoch_accs)
+            clear_output()
+            plot_stuff(losses=epoch_losses, accs=epoch_accs)
 
-    torch.save(model.state_dict(), f"{name}.pth")
-    print(f"saved model to `{name}.pth`")
+        torch.save(model.state_dict(), f"{name}.pth")
+        print(f"saved model to `{name}.pth`")
+
+    except KeyboardInterrupt:
+        print(f"interrupted")
+        torch.save(model.state_dict(), f"{name}-tmp.pth")
+        print(f"saved model to `{name}-tmp.pth`")

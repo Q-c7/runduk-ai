@@ -136,6 +136,8 @@ HEROES = [
     Hero(122, 136, "Marci", [3, 1], [4, 5]),
     Hero(123, 137, "Primal_Beast", [3, 4], [2]),
     Hero(124, 138, "Muerta", [1, 2], []),
+    Hero(125, 131, "Ring_Master", [1, 2], []),
+    Hero(126, 145, "Kez", [1, 2], []),
 ]
 
 TKINTER_BIG_FONT = ("Helvetica", 18)

@@ -26,7 +26,10 @@ class HeroDrafterButton(tk.Frame):
         # Load the image
         script_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(
-            script_dir, "../../unfinished_web_gui", "hero_pics", f"{hero.name.lower()}.png"
+            script_dir,
+            "../../unfinished_web_gui",
+            "hero_pics",
+            f"{hero.name.lower()}.png",
         )
         assert os.path.exists(image_path), image_path
         image = Image.open(image_path)

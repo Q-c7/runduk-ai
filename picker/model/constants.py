@@ -124,4 +124,6 @@ HERO_TRANSFORM = {
     136: 122,
     137: 123,
     138: 124,
+    131: 125,  # Fucking Ring Master
+    145: 126,
 }

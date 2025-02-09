@@ -6,6 +6,7 @@ import logging
 
 from picker.app.constants import HEROES
 from picker.model.transformer import TransformerModel
+from picker.scraping.constants import RELEVANT_GAME_MODES
 
 
 class ProgramRunnerWithoutGUI:

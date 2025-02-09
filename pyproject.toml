@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "picker"
-version = "0.1.0"
+version = "0.1.1"
 description = "zxc"
 authors = [ "qc7 <yaz0zero@gmail.com>" ]
 readme = "README.md"
@@ -20,6 +20,13 @@ black = "^23.1.0"
 wandb = "^0.13.10"
 pandas = "^2.0.1"
 flask = "^2.3.2"
+jupyter = "^1.1.1"
+notebook = "^7.3.2"
+typing-extensions = "^4.12.2"
+orjson = "^3.10.15"
+polars = "^1.22.0"
+pyarrow = "^19.0.0"
+matplotlib = "^3.10.0"
 
 [build-system]
 requires = ["poetry-core"]
