@@ -19,10 +19,19 @@ class ProgramRunnerWithoutGUI:
         self._enemy_bans: list[int] = []
 
         logging.info("Loading _model...")
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        full_path = os.path.join(script_dir, model_path)
+        # Handle both relative and absolute paths
+        if os.path.isabs(model_path):
+            full_path = model_path
+        else:
+            # First try current working directory, then script directory
+            if os.path.exists(model_path):
+                full_path = os.path.abspath(model_path)
+            else:
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                full_path = os.path.join(script_dir, model_path)
+        
         self._model: TransformerModel = torch.load(
-            full_path
+            full_path, weights_only=False
         )  # FIXME change to a JIT script
         self._model.cpu().eval()
         logging.info("Model loaded")

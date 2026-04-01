@@ -141,3 +141,10 @@ dmypy.json
 DATA
 SAVED_HERO_PICS
 .pickle
+
+# Hero images (downloaded from Steam CDN via picker.app.download_hero_pics)
+picker/app/gui/picker_frame/hero_pics/
+
+# Model files
+*.pth
+*.raw_model
