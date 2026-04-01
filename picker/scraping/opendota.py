@@ -27,7 +27,10 @@ def _parse_match(match: dict[Any, Any]) -> dict[str, Any] | None:
 
 
 def _generate_request(
-    left_ts: datetime.datetime, right_ts: datetime.datetime, duration: int = 900, matches_count: int = 200000
+    left_ts: datetime.datetime,
+    right_ts: datetime.datetime,
+    duration: int = 900,
+    matches_count: int = 200000,
 ) -> str:
     left_ts_int = int(left_ts.timestamp())
     right_ts_int = int(right_ts.timestamp())
@@ -38,9 +41,7 @@ def _generate_request(
     %0AFROM%20public_matches
     %0AWHERE%20start_time%20BETWEEN%20{left_ts_int}%20AND%20{right_ts_int}
     %0AAND%20duration%20%3E%20{duration}%20%0ALIMIT%20{matches_count})%20m
-    """.replace(
-        "\n", ""
-    )
+    """.replace("\n", "")
 
     return request
 

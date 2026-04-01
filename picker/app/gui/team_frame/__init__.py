@@ -1,1 +1,1 @@
-from .main_frame import TeamFrame
+from .main_frame import TeamFrame as TeamFrame

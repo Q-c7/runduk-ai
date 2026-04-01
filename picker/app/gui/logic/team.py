@@ -1,5 +1,6 @@
 import os.path
 from collections import defaultdict
+from typing import Any
 
 import pandas as pd
 import pickle
@@ -80,10 +81,10 @@ class TeamManager:
         return pd.DataFrame(table_dict).set_index("name")
 
     def add_player(self, name: str) -> None:
-        table_dict = {"name": [name], "is_active": [False]}
+        table_dict: dict[str, Any] = {"name": [name], "is_active": [False]}
         for i in range(1, 6):
             table_dict[f"good_pos{i}"] = [[]]
-            table_dict[f"ok_pos{i}"] = [[]]  # not used at the moment
+            table_dict[f"ok_pos{i}"] = [[]]
 
         row = pd.DataFrame(table_dict)
 

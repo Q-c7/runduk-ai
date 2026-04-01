@@ -73,7 +73,9 @@ class TeamHeroesDisplay(AbstractFrame):
             list_frame.pack(side=tk.LEFT)
 
             tk.Label(
-                list_frame, text=f"Position {pos+1}:", font=(*TKINTER_BIG_FONT, "bold")
+                list_frame,
+                text=f"Position {pos + 1}:",
+                font=(*TKINTER_BIG_FONT, "bold"),
             ).pack(side=tk.TOP)
             # Add labels for each name in the list
             for hero_id in sublist:

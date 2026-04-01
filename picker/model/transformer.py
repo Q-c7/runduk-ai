@@ -30,11 +30,11 @@ class TransformerModel(nn.Module):
         assert "team" in self.embeddings.keys(), "Please provide hero embedding"
         assert "rank" in self.embeddings.keys(), "Please provide rank embedding"
 
-        self.hidden_dim = (
-            self.embeddings["team"].embedding_dim
-            + 1
-            + self.embeddings["rank"].embedding_dim
-        )
+        team_emb = self.embeddings["team"]
+        rank_emb = self.embeddings["rank"]
+        assert isinstance(team_emb, nn.Embedding)
+        assert isinstance(rank_emb, nn.Embedding)
+        self.hidden_dim = team_emb.embedding_dim + 1 + rank_emb.embedding_dim
 
         self.cls_vector = nn.Parameter(torch.rand(self.hidden_dim, requires_grad=True))
 
@@ -56,7 +56,7 @@ class TransformerModel(nn.Module):
             nn.Linear(self.hidden_dim, 2),
         )
 
-    def _prepare(self, src: Tensor, rank: Tensor, device: str = "cpu"):
+    def _prepare(self, src: Tensor, rank: Tensor, device: str | torch.device = "cpu"):
         team_embs = torch.cat(
             (
                 torch.ones(src.shape[0], 5, 1, device=device),  # first 5 are Radiant

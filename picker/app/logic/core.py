@@ -6,7 +6,6 @@ import logging
 
 from picker.app.constants import HEROES
 from picker.model.transformer import TransformerModel
-from picker.scraping.constants import RELEVANT_GAME_MODES
 
 
 class ProgramRunnerWithoutGUI:
@@ -29,7 +28,7 @@ class ProgramRunnerWithoutGUI:
             else:
                 script_dir = os.path.dirname(os.path.abspath(__file__))
                 full_path = os.path.join(script_dir, model_path)
-        
+
         self._model: TransformerModel = torch.load(
             full_path, weights_only=False
         )  # FIXME change to a JIT script

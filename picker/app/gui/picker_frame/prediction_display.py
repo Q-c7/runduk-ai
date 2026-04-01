@@ -3,7 +3,7 @@ import time
 
 from collections import defaultdict
 
-from picker.app.constants import HEROES, TKINTER_BIG_FONT
+from picker.app.constants import HEROES
 
 PREDICTOR_SIZE = (1100, 400)
 PREFERENCE_CONSTANT = 0.1
@@ -13,8 +13,8 @@ TIMEOUT = 0.1
 class PredictionDisplay(tk.Frame):
     def __init__(self, master=None, *args, **kwargs):
         super().__init__(master=master, *args, **kwargs, background="blue")
-        self.predictions = {}
-        self.preferences = defaultdict(list)
+        self.predictions: dict[int, float] = {}
+        self.preferences: defaultdict[int, list[int]] = defaultdict(list)
         self.preference_coefficient: float = 0.0
         self._last_update = time.perf_counter()
 
@@ -35,7 +35,7 @@ class PredictionDisplay(tk.Frame):
         self.canvas.bind("<Configure>", self.on_canvas_configure)
         self.canvas.bind("<MouseWheel>", self.on_mousewheel)
 
-    def update_preds(self, new_preds: dict[str, float]):
+    def update_preds(self, new_preds: dict[int, float]):
         self.predictions = new_preds
         self.update_ui()
 
@@ -92,7 +92,9 @@ class PredictionDisplay(tk.Frame):
                 rect_frame = tk.Frame(self.rect_frame, relief=tk.SOLID, borderwidth=1)
 
                 rect_label = tk.Label(
-                    rect_frame, text=f"{HEROES[hero_id].name}\n{score:.3f}", font=("gothic", 16, "bold")
+                    rect_frame,
+                    text=f"{HEROES[hero_id].name}\n{score:.3f}",
+                    font=("gothic", 16, "bold"),
                 )
                 rect_label.pack(padx=4, pady=4)
 

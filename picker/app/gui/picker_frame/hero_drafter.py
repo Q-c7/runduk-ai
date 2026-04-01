@@ -46,7 +46,7 @@ class HeroDrafter(AbstractFrame):
         )
 
         self.canvas.bind("<MouseWheel>", self.on_mousewheel)
-        
+
         # Bind mouse wheel to the entire frame and all its children
         self.bind("<MouseWheel>", self.on_mousewheel)
         self.frame.bind("<MouseWheel>", self.on_mousewheel)

@@ -30,7 +30,9 @@ def _make_placeholder(name: str) -> Image.Image:
     tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text(
         ((FRAME_SIZE[0] - tw) / 2, (FRAME_SIZE[1] - th) / 2),
-        label, fill="white", font=font,
+        label,
+        fill="white",
+        font=font,
     )
     return img
 
@@ -38,7 +40,7 @@ def _make_placeholder(name: str) -> Image.Image:
 def _load_hero_image(hero_name: str) -> Image.Image:
     path = os.path.join(HERO_PICS_DIR, f"{hero_name.lower()}.png")
     if os.path.exists(path):
-        return Image.open(path).resize(FRAME_SIZE, Image.LANCZOS)
+        return Image.open(path).resize(FRAME_SIZE, Image.Resampling.LANCZOS)
     return _make_placeholder(hero_name)
 
 
@@ -75,7 +77,7 @@ class HeroDrafterButton(tk.Frame):
         # Bind the events for mouse enter and leave
         self.bind("<Enter>", self._show_buttons)
         self.bind("<Leave>", self._hide_buttons)
-        
+
         # Bind mouse wheel events to propagate to parent canvas
         self.bind("<MouseWheel>", self._on_mousewheel)
         self.canvas_frame.bind("<MouseWheel>", self._on_mousewheel)
@@ -142,20 +144,15 @@ class HeroDrafterButton(tk.Frame):
         self.rectangle_frame.pack_forget()
         self.canvas_frame.pack()
 
-    def _on_mousewheel(self, event):
+    def _on_mousewheel(self, event: "tk.Event[tk.Misc]") -> None:
         """Propagate mouse wheel events to the parent canvas for scrolling"""
-        # Find the parent canvas (HeroDrafter) and call its mouse wheel handler
         parent = self.master
-        while parent and not hasattr(parent, 'on_mousewheel'):
-            parent = parent.master
-        if parent and hasattr(parent, 'on_mousewheel'):
-            parent.on_mousewheel(event)
-        # Also try to find the canvas directly
-        canvas_parent = self.master
-        while canvas_parent and not hasattr(canvas_parent, 'canvas'):
-            canvas_parent = canvas_parent.master
-        if canvas_parent and hasattr(canvas_parent, 'canvas'):
-            canvas_parent.on_mousewheel(event)
+        while parent and not hasattr(parent, "on_mousewheel"):
+            parent = parent.master  # type: ignore[union-attr]
+        if parent:
+            handler = getattr(parent, "on_mousewheel", None)
+            if handler is not None:
+                handler(event)
 
     def set_status(self, status):
         self.disabled = status

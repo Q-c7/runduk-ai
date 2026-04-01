@@ -7,7 +7,11 @@ from picker.model.constants import HERO_TRANSFORM
 
 class TeamDataset(Dataset):
     def __init__(
-        self, path: str, dicts_override: list[dict] | None = None, p: float = 0.2, give_rank: bool = True
+        self,
+        path: str,
+        dicts_override: list[dict] | None = None,
+        p: float = 0.2,
+        give_rank: bool = True,
     ):
         if dicts_override is not None:
             self.dicts = dicts_override
@@ -33,7 +37,7 @@ class TeamDataset(Dataset):
         else:
             return tensor * (torch.rand(10) >= self.p)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx):  # type: ignore[override]  # ty: ignore[invalid-method-override]
         dict_idx = idx // 2
         dict_with_info = self.dicts[dict_idx]
         winner, loser = dict_with_info["winner_team"], dict_with_info["loser_team"]

@@ -13,7 +13,7 @@ class PlayersDisplay(AbstractFrame):
             *args,
             **kwargs,
             width=PLAYER_WIDGET_SIZE[0],
-            height=PLAYER_WIDGET_SIZE[1]
+            height=PLAYER_WIDGET_SIZE[1],
         )
 
         # Line with text

@@ -21,18 +21,36 @@ def parse_freq(s: str) -> datetime.timedelta:
         case "m":
             return datetime.timedelta(minutes=value)
         case _:
-            raise ValueError(f"Unknown freq unit '{unit}', use h/d/m (e.g. 6h, 1d, 30m)")
+            raise ValueError(
+                f"Unknown freq unit '{unit}', use h/d/m (e.g. 6h, 1d, 30m)"
+            )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Scrape Dota 2 public match data from OpenDota API",
     )
-    parser.add_argument("--start", type=parse_date, required=True, help="Start date (YYYY-MM-DD)")
-    parser.add_argument("--end", type=parse_date, required=True, help="End date (YYYY-MM-DD)")
-    parser.add_argument("--output", type=str, default=None, help="Output parquet path (default: DATA/raw_{start}_{end}.parquet)")
-    parser.add_argument("--freq", type=parse_freq, default=datetime.timedelta(hours=6), help="Time window per API request (default: 6h)")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
+    parser.add_argument(
+        "--start", type=parse_date, required=True, help="Start date (YYYY-MM-DD)"
+    )
+    parser.add_argument(
+        "--end", type=parse_date, required=True, help="End date (YYYY-MM-DD)"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Output parquet path (default: DATA/raw_{start}_{end}.parquet)",
+    )
+    parser.add_argument(
+        "--freq",
+        type=parse_freq,
+        default=datetime.timedelta(hours=6),
+        help="Time window per API request (default: 6h)",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable debug logging"
+    )
     args = parser.parse_args()
 
     logging.basicConfig(

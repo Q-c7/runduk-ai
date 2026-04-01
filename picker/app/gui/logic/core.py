@@ -26,9 +26,10 @@ class DesktopProgramRunner(ProgramRunnerWithoutGUI):
 
         self.prediction_display.update_preds(self.latest_predictions)
         self.prediction_display.update_ui()
-    
+
     def update_fonts(self) -> None:
         """Update fonts for all UI elements"""
         for ui_element in self._ui_elements:
-            if hasattr(ui_element, 'update_font'):
-                ui_element.update_font()
+            fn = getattr(ui_element, "update_font", None)
+            if fn is not None:
+                fn()

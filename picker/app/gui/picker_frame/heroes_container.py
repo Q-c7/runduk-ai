@@ -44,7 +44,7 @@ class HeroesContainer(AbstractFrame):
                 relief=tk.GROOVE,
             )
             button.config(image=_get_transparent_image(self.scale))
-            button.image = _get_transparent_image(self.scale)
+            button.image = _get_transparent_image(self.scale)  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
             x = (idx % self.button_count[0]) * self.scale[0] + (
                 idx >= self.button_count[0]
@@ -60,7 +60,7 @@ class HeroesContainer(AbstractFrame):
     def _get_image(hero, scale):
         image = _load_hero_image(hero.name)
         if image.size != scale:
-            image = image.resize(scale, Image.LANCZOS)
+            image = image.resize(scale, Image.Resampling.LANCZOS)
         return ImageTk.PhotoImage(image)
 
     def update_ui(self):
@@ -68,12 +68,12 @@ class HeroesContainer(AbstractFrame):
 
         for hero_id, button in zip(team, self.buttons):
             assert len(HEROES) > hero_id > 0
-            button.image = self._get_image(HEROES[hero_id], scale=self.scale)
-            button.configure(image=button.image)
+            button.image = self._get_image(HEROES[hero_id], scale=self.scale)  # type: ignore[attr-defined]
+            button.configure(image=button.image)  # type: ignore[attr-defined]
 
         for button in self.buttons[len(team) :]:
-            button.image = _get_transparent_image(self.scale)
-            button.config(image=button.image)
+            button.image = _get_transparent_image(self.scale)  # type: ignore[attr-defined]
+            button.config(image=button.image)  # type: ignore[attr-defined]
 
     def button_clicked(self, button_id: int):
         team = self.runner.container(is_enemy=self.is_enemy, is_ban=self.is_ban)

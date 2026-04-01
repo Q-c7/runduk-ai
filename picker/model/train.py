@@ -1,6 +1,5 @@
 import logging
 import os
-from pathlib import Path
 
 import numpy as np
 import torch
@@ -48,7 +47,9 @@ def evaluate(model, test_dl, device: str) -> float:
     return correct / len(test_dl.dataset)
 
 
-def save_plots(epoch_losses: list[float], epoch_accs: list[list[float]], plot_dir: str) -> None:
+def save_plots(
+    epoch_losses: list[float], epoch_accs: list[list[float]], plot_dir: str
+) -> None:
     import matplotlib.pyplot as plt
 
     os.makedirs(plot_dir, exist_ok=True)
@@ -89,7 +90,9 @@ def run_training(
 ) -> None:
     torch.manual_seed(3407)
 
-    train_dl = DataLoader(train_data, shuffle=True, batch_size=batch_size, num_workers=8)
+    train_dl = DataLoader(
+        train_data, shuffle=True, batch_size=batch_size, num_workers=8
+    )
     test_dls = [
         DataLoader(td, shuffle=False, batch_size=batch_size, num_workers=8)
         for td in test_datas

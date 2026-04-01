@@ -55,19 +55,19 @@ class PickerFrame(tk.Frame):
 
         # Create a container for the right-side controls
         controls_frame = tk.Frame(self.predictor_frame)
-        
+
         # Create ExplorationSlider
         exploration_slider = ExplorationSlider(
             master=controls_frame, predictor_widget=predictor_widget
         )
 
-        # fixme come up with an interface of some sort
-        if hasattr(self.master, "master") and hasattr(self.master.master, "show_frame"):
+        app = getattr(getattr(self.master, "master", None), "show_frame", None)
+        if app is not None:
             go_back_button = tk.Button(
                 controls_frame,
                 text="← Back to Team",
-                command=lambda: self.master.master.show_frame("TeamFrame"),
-                font=TKINTER_SMALL_FONT
+                command=lambda: app("TeamFrame"),
+                font=TKINTER_SMALL_FONT,
             )
 
             # Stack the controls vertically

@@ -24,7 +24,7 @@ class ExplorationSlider(tk.Frame):
             orient="horizontal",
             command=self.slider_changed,
             variable=self.current_value,
-            length=120  # Make slider shorter
+            length=120,  # Make slider shorter
         )
         self.slider.grid(column=1, row=0, padx=5)
 

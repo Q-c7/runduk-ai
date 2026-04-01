@@ -12,22 +12,78 @@ from picker.model.transformer import TransformerModel
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train the Dota 2 draft prediction model")
-    parser.add_argument("--data", type=str, required=True, help="Path to preprocessed parquet file")
-    parser.add_argument("--name", type=str, default="latest", help="Model name for saved files (default: latest)")
-    parser.add_argument("--epochs", type=int, default=100, help="Number of training epochs (default: 100)")
-    parser.add_argument("--batch-size", type=int, default=8192, help="Batch size (default: 8192)")
-    parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate (default: 3e-4)")
-    parser.add_argument("--device", type=str, default="cuda", help="Device (default: cuda)")
-    parser.add_argument("--num-layers", type=int, default=6, help="Transformer encoder layers (default: 6)")
-    parser.add_argument("--num-heads", type=int, default=8, help="Attention heads (default: 8)")
-    parser.add_argument("--dropout", type=float, default=0.1, help="Dropout (default: 0.1)")
-    parser.add_argument("--hero-emb-dim", type=int, default=28, help="Hero embedding dimension (default: 28)")
-    parser.add_argument("--rank-emb-dim", type=int, default=3, help="Rank embedding dimension (default: 3)")
-    parser.add_argument("--mask-p", type=float, default=0.2, help="Hero masking probability during training (default: 0.2)")
-    parser.add_argument("--test-split", type=float, default=0.05, help="Fraction of data for test set (default: 0.05)")
-    parser.add_argument("--plot-dir", type=str, default=None, help="Directory to save training plots (optional)")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
+    parser = argparse.ArgumentParser(
+        description="Train the Dota 2 draft prediction model"
+    )
+    parser.add_argument(
+        "--data", type=str, required=True, help="Path to preprocessed parquet file"
+    )
+    parser.add_argument(
+        "--name",
+        type=str,
+        default="latest",
+        help="Model name for saved files (default: latest)",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=100,
+        help="Number of training epochs (default: 100)",
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=8192, help="Batch size (default: 8192)"
+    )
+    parser.add_argument(
+        "--lr", type=float, default=3e-4, help="Learning rate (default: 3e-4)"
+    )
+    parser.add_argument(
+        "--device", type=str, default="cuda", help="Device (default: cuda)"
+    )
+    parser.add_argument(
+        "--num-layers",
+        type=int,
+        default=6,
+        help="Transformer encoder layers (default: 6)",
+    )
+    parser.add_argument(
+        "--num-heads", type=int, default=8, help="Attention heads (default: 8)"
+    )
+    parser.add_argument(
+        "--dropout", type=float, default=0.1, help="Dropout (default: 0.1)"
+    )
+    parser.add_argument(
+        "--hero-emb-dim",
+        type=int,
+        default=28,
+        help="Hero embedding dimension (default: 28)",
+    )
+    parser.add_argument(
+        "--rank-emb-dim",
+        type=int,
+        default=3,
+        help="Rank embedding dimension (default: 3)",
+    )
+    parser.add_argument(
+        "--mask-p",
+        type=float,
+        default=0.2,
+        help="Hero masking probability during training (default: 0.2)",
+    )
+    parser.add_argument(
+        "--test-split",
+        type=float,
+        default=0.05,
+        help="Fraction of data for test set (default: 0.05)",
+    )
+    parser.add_argument(
+        "--plot-dir",
+        type=str,
+        default=None,
+        help="Directory to save training plots (optional)",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable debug logging"
+    )
     args = parser.parse_args()
 
     logging.basicConfig(

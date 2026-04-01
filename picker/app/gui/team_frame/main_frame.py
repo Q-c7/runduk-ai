@@ -52,8 +52,10 @@ class TeamFrame(tk.Frame):
             name="team_heroes_display", element=self.team_heroes_display
         )
 
-        # fixme come up with an interface of some sort
-        if hasattr(self.master, "master") and hasattr(self.master.master, "show_frame"):
+        self._show_frame_fn = getattr(
+            getattr(self.master, "master", None), "show_frame", None
+        )
+        if self._show_frame_fn is not None:
             go_back_button = tk.Button(
                 self.bottom_frame,
                 text="Save and go to picker screen",
@@ -79,12 +81,9 @@ class TeamFrame(tk.Frame):
         self.bottom_frame.pack(side="bottom")
 
     def _next_stage(self):
-        assert hasattr(self.master, "master") and hasattr(
-            self.master.master, "show_frame"
-        )
+        assert self._show_frame_fn is not None
         self.manager.save_team()
-
-        self.master.master.show_frame(
+        self._show_frame_fn(
             "PickerFrame", to_predictor=self.manager.get_reversed_preferences()
         )
 
