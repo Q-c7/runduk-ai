@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-added-large-files
+        args: [ '--maxkb=10000' ]
+      - id: check-json
+        exclude: ^legacy/
+      - id: check-toml
+      - id: check-yaml
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+        args: [ '--fix=lf' ]
+      - id: trailing-whitespace
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: detect-private-key
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff
+        entry: ruff check --fix picker/
+        language: system
+        pass_filenames: false
+      - id: ruff-format
+        name: ruff format
+        entry: ruff format picker/
+        language: system
+        pass_filenames: false
+      - id: ty
+        name: ty
+        entry: ty check picker/
+        language: system
+        pass_filenames: false
