@@ -138,7 +138,7 @@ venv.bak/
 dmypy.json
 
 # Temporary files
-DATA
+/DATA
 SAVED_HERO_PICS
 .pickle
 
@@ -148,3 +148,7 @@ picker/app/gui/picker_frame/hero_pics/
 # Model files
 *.pth
 *.raw_model
+checkpoints/
+
+# Training plots
+plots/

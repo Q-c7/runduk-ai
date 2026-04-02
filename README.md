@@ -49,7 +49,7 @@ python -m picker.model --data DATA/processed.parquet --name latest --epochs 100 
 
 Saves `latest.pth` (state dict) and `latest.raw_model` (full model for the GUI).
 
-Options: `--batch-size 8192`, `--lr 3e-4`, `--num-layers 6`, `--num-heads 8`, `--hero-emb-dim 28`, `--rank-emb-dim 3`, `--mask-p 0.2`, `--test-split 0.05`, `--plot-dir plots/`.
+Options: `--batch-size 8192`, `--lr 3e-4`, `--num-layers 6`, `--num-heads 8`, `--d-model 64`, `--hero-emb-dim 28`, `--rank-emb-dim 3`, `--mask-p 0.2`, `--test-split 0.05`, `--plot-dir plots/`.
 
 ## GUI
 

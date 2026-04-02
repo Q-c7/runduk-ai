@@ -19,14 +19,17 @@ def preprocess(
     df = pl.read_parquet(input_path)
     logging.info(f"Loaded {len(df)} rows")
 
-    df = df.filter(pl.col("game_mode").is_in(list(game_modes)))
+    df = df.filter(
+        pl.col("game_mode").is_in(list(game_modes)),
+        pl.col("avg_rank_tier").is_not_null(),
+        pl.col("radiant_team").list.len() == 5,
+        pl.col("dire_team").list.len() == 5,
+    )
     logging.info(f"{len(df)} rows after filtering to game modes {game_modes}")
 
     df = df.with_columns(
-        pl.col("avg_rank_tier")
-        .map_elements(
-            lambda x: min(MAX_RANK_BUCKET, x // 10 - 1), return_dtype=pl.Int64
-        )
+        (pl.col("avg_rank_tier").cast(pl.Int64) // 10 - 1)
+        .clip(0, MAX_RANK_BUCKET)
         .alias("avg_rank_tier"),
         pl.when("radiant_win")
         .then("radiant_team")

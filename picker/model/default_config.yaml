@@ -1,0 +1,80 @@
+# ─── Training ────────────────────────────────────────────────────────────────
+
+# Output name prefix for saved model files ({name}.pth and {name}.raw_model)
+name: latest
+
+# Total training epochs
+epochs: 50
+
+# Samples per gradient step. Large values (4096–8192) work well because
+# individual matches are cheap to process and bigger batches reduce noise
+# in the gradient for this binary-classification task.
+batch_size: 8192
+
+# Adam learning rate. 3e-4 is the "Karpathy constant" — a solid default
+# for Adam on transformer-sized models.
+lr: 3e-4
+
+# PyTorch device identifier (cuda, cpu, mps, …)
+device: cuda
+
+# ─── Model architecture ─────────────────────────────────────────────────────
+
+# Number of stacked TransformerEncoderLayers. More layers = more capacity
+# to learn hero interaction patterns, but diminishing returns past ~6 for
+# a 10-token sequence.
+num_layers: 6
+
+# Attention heads. Each head can specialise on a different kind of
+# hero–hero relationship (synergy, counter, lane matchup, …).
+# Must evenly divide d_model.
+num_heads: 8
+
+# Transformer working dimension. The raw embedding concatenation
+# (hero_emb + 1 side scalar + rank_emb) is projected to this size
+# before entering the encoder. Larger = more capacity; must be
+# divisible by num_heads.
+d_model: 64
+
+# Dropout applied inside the encoder layers and the classification head.
+dropout: 0.1
+
+# ─── Embeddings ──────────────────────────────────────────────────────────────
+
+# Dimensionality of the per-hero learned embedding vector.
+# 128 unique heroes → 129-row table (index 0 is padding).
+hero_emb_dim: 28
+
+# Dimensionality of the rank-tier embedding. There are 6 rank buckets
+# (0 = unknown through 5 = Immortal), so this can stay small.
+rank_emb_dim: 3
+
+# ─── Data / regularisation ──────────────────────────────────────────────────
+
+# Probability of zeroing out each hero slot independently during training.
+# Simulates incomplete drafts so the model learns to predict from partial
+# information — critical for the GUI use-case where picks are added one
+# by one.
+mask_p: 0.2
+
+# Fraction of the dataset held out for evaluation (temporal split).
+test_split: 0.05
+
+# CrossEntropyLoss label smoothing. Dota outcomes are inherently noisy —
+# even the best draft rarely guarantees more than ~60 % win rate — so
+# softening the 0/1 targets prevents the model from becoming overconfident.
+label_smoothing: 0.1
+
+# ─── Checkpointing ──────────────────────────────────────────────────────────
+
+# Directory for checkpoint files.
+checkpoint_dir: checkpoints
+
+# Save a checkpoint every N training steps (batches).
+# With batch_size 8192 and ~12M samples, one epoch ≈ 1500 steps,
+# so 500 gives ~3 checkpoints per epoch.
+checkpoint_every: 500
+
+# Maximum number of checkpoint files to retain. Oldest are deleted
+# when the limit is exceeded. Keeps disk usage bounded.
+max_checkpoints: 10

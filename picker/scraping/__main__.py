@@ -3,7 +3,10 @@ import datetime
 import logging
 import os
 
-from picker.scraping.opendota import request_matches
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+from picker.scraping.opendota import iter_match_chunks
 
 
 def parse_date(s: str) -> datetime.datetime:
@@ -67,15 +70,27 @@ def main() -> None:
     logging.info(f"Scraping matches from {args.start} to {args.end}")
     logging.info(f"Frequency: {args.freq}, output: {args.output}")
 
-    df = request_matches(
-        left_ts=args.start,
-        right_ts=args.end,
-        freq_dt=args.freq,
-    )
-
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
-    df.to_parquet(args.output)
-    logging.info(f"Saved {len(df)} matches to {args.output}")
+
+    writer: pq.ParquetWriter | None = None
+    total_rows = 0
+
+    try:
+        for chunk_df in iter_match_chunks(
+            left_ts=args.start,
+            right_ts=args.end,
+            freq_dt=args.freq,
+        ):
+            table = pa.Table.from_pandas(chunk_df)
+            if writer is None:
+                writer = pq.ParquetWriter(args.output, table.schema)
+            writer.write_table(table)
+            total_rows += len(chunk_df)
+    finally:
+        if writer is not None:
+            writer.close()
+
+    logging.info(f"Saved {total_rows} matches to {args.output}")
 
 
 if __name__ == "__main__":

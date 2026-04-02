@@ -14,6 +14,7 @@ class TransformerModel(nn.Module):
     def __init__(
         self,
         embedding_dict: dict[str, Any],
+        d_model: int | None = None,
         num_layers: int = 4,
         num_heads: int = 8,
         dropout: float = 0.1,
@@ -34,8 +35,10 @@ class TransformerModel(nn.Module):
         rank_emb = self.embeddings["rank"]
         assert isinstance(team_emb, nn.Embedding)
         assert isinstance(rank_emb, nn.Embedding)
-        self.hidden_dim = team_emb.embedding_dim + 1 + rank_emb.embedding_dim
+        concat_dim = team_emb.embedding_dim + 1 + rank_emb.embedding_dim
+        self.hidden_dim = d_model if d_model is not None else concat_dim
 
+        self.input_proj = nn.Linear(concat_dim, self.hidden_dim)
         self.cls_vector = nn.Parameter(torch.rand(self.hidden_dim, requires_grad=True))
 
         self.encoder = TransformerEncoder(
@@ -47,12 +50,16 @@ class TransformerModel(nn.Module):
                 dropout=dropout,
             ),
             num_layers=num_layers,
-            norm=nn.LayerNorm([self.SEQ_LEN + 1, self.hidden_dim]),
+            norm=nn.LayerNorm(self.hidden_dim),
         )
 
         self.head = nn.Sequential(
-            nn.Flatten(),
-            nn.ReLU(),
+            nn.Linear(self.hidden_dim, self.hidden_dim * 4),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(self.hidden_dim * 4, self.hidden_dim),
+            nn.GELU(),
+            nn.Dropout(dropout),
             nn.Linear(self.hidden_dim, 2),
         )
 
@@ -68,23 +75,25 @@ class TransformerModel(nn.Module):
         rank_embs = (
             self.embeddings["rank"](rank).repeat(1, 10).reshape(src.shape[0], 10, -1)
         )
-        return torch.cat((hero_embs, team_embs, rank_embs), dim=-1)
+        return self.input_proj(torch.cat((hero_embs, team_embs, rank_embs), dim=-1))
 
     def forward(self, inputs_: tuple[Tensor, Tensor]) -> Tensor:
         src, rank = inputs_
         x = self._prepare(src, rank, device=src.device)
 
+        pad_mask = src == 0  # [batch, 10]
+        cls_mask = torch.zeros(src.shape[0], 1, dtype=torch.bool, device=src.device)
+        pad_mask = torch.cat((pad_mask, cls_mask), dim=1)  # [batch, 11]
+
         x = torch.cat(
             (
                 x,
-                self.cls_vector.repeat(x.shape[0])
-                .reshape(x.shape[0], x.shape[-1])
-                .unsqueeze(1),
+                self.cls_vector.view(1, 1, -1).expand(x.shape[0], -1, -1),
             ),
             dim=-2,
         )
 
-        x = self.encoder(x)  # , src_key_padding_mask=mask
+        x = self.encoder(x, src_key_padding_mask=pad_mask)
 
         cls_encoded = x[:, -1, :]
 
