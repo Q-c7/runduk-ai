@@ -63,12 +63,33 @@ def main() -> None:
         default=None,
         help="Path to checkpoint .pt file to resume from",
     )
+    parser.add_argument(
+        "--init-weights",
+        type=str,
+        default=None,
+        help="Path to a .pth state_dict for fine-tuning (fresh optimizer, epoch 0). "
+        "Mutually exclusive with --resume.",
+    )
+    parser.add_argument(
+        "--early-stopping-patience",
+        type=int,
+        help="Stop after this many val evals without improvement (0 = off). "
+        "Also writes best.pt in checkpoint-dir.",
+    )
+    parser.add_argument(
+        "--early-stopping-min-delta",
+        type=float,
+        help="Minimum mean val acc improvement (%%) to reset patience.",
+    )
 
     args, _ = parser.parse_known_args()
     cfg = load_config(args.config)
 
     parser.set_defaults(**cfg)
     args = parser.parse_args()
+
+    if args.resume and args.init_weights:
+        parser.error("Use either --resume or --init-weights, not both.")
 
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
@@ -106,6 +127,11 @@ def main() -> None:
     )
     logging.info(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
 
+    if args.init_weights:
+        sd = torch.load(args.init_weights, map_location="cpu", weights_only=True)
+        model.load_state_dict(sd)
+        logging.info(f"Loaded initial weights from {args.init_weights} (fine-tuning)")
+
     run_training(
         model=model,
         name=args.name,
@@ -121,6 +147,8 @@ def main() -> None:
         checkpoint_every=args.checkpoint_every,
         max_checkpoints=args.max_checkpoints,
         resume=args.resume,
+        early_stopping_patience=args.early_stopping_patience,
+        early_stopping_min_delta=args.early_stopping_min_delta,
     )
 
 

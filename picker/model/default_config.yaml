@@ -78,3 +78,8 @@ checkpoint_every: 500
 # Maximum number of checkpoint files to retain. Oldest are deleted
 # when the limit is exceeded. Keeps disk usage bounded.
 max_checkpoints: 10
+
+# Early stopping (monitors mean test accuracy across eval sets). Set to 0 to disable.
+# Stops after this many evaluations without val improvement of at least min_delta (%).
+early_stopping_patience: 8
+early_stopping_min_delta: 0.02
