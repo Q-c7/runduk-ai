@@ -5,6 +5,7 @@ import orjson
 import pandas as pd
 from time import sleep, perf_counter
 
+from collections.abc import Iterator
 from typing import Any
 
 import logging
@@ -94,10 +95,10 @@ def request_matches_by_time(
     return parsed_matches
 
 
-def request_matches(
+def iter_match_chunks(
     left_ts: datetime.datetime, right_ts: datetime.datetime, freq_dt: datetime.timedelta
-) -> pd.DataFrame:
-    data = []
+) -> Iterator[pd.DataFrame]:
+    """Yield one DataFrame per time window, keeping memory bounded."""
     last_req_time = -1.0
 
     for start in tqdm(pd.date_range(start=left_ts, end=right_ts, freq=freq_dt)):
@@ -110,6 +111,6 @@ def request_matches(
 
         last_req_time = perf_counter()
 
-        data.extend(request_matches_by_time(left_ts=start, right_ts=end))
-
-    return pd.DataFrame(data)
+        matches = request_matches_by_time(left_ts=start, right_ts=end)
+        if matches:
+            yield pd.DataFrame(matches)
